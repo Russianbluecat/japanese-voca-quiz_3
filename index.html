@@ -287,6 +287,26 @@
   .fill-example .ko { color:var(--muted); margin-top:2px; font-style:italic; font-size:12px; }
   .auto-next-notice { display:none; text-align:center; font-size:12px; color:var(--muted); margin-top:12px; font-style:italic; animation:fadeIn 0.3s ease; }
   .auto-next-notice.show { display:block; }
+  .fill-extra-btns { display:none; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .fill-extra-btns.show { display:flex; }
+  .fill-extra-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text);
+  }
+  .fill-extra-btn.hira { border-color: var(--accent); color: var(--accent); }
+  .fill-extra-btn.hira:hover { background: rgba(124,106,247,0.1); }
+  .fill-extra-btn.papago { border-color: #03c75a; color: #03c75a; }
+  .fill-extra-btn.papago:hover { background: rgba(3,199,90,0.08); }
+  .hira-reveal { display:none; margin-top:10px; padding:10px 16px; background:rgba(124,106,247,0.08); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; font-family:'Noto Sans JP',sans-serif; font-size:14px; color:var(--text); line-height:1.8; }
+  .hira-reveal.show { display:block; }
 </style>
 </head>
 <body>
@@ -382,6 +402,11 @@
         <div class="fill-example" id="f-example">
           <div class="ja" id="f-ex-ja"></div>
           <div class="ko" id="f-ex-ko"></div>
+          <div class="fill-extra-btns" id="f-extra-btns">
+            <button class="fill-extra-btn hira" onclick="fToggleHira()">🔤 히라가나 보기</button>
+            <button class="fill-extra-btn papago" onclick="fOpenPapago()">🌐 번역 보기</button>
+          </div>
+          <div class="hira-reveal" id="f-hira-reveal"></div>
         </div>
       </div>
       <div class="auto-next-notice" id="f-auto-notice">잠시 후 다음 문제로 넘어갑니다...</div>
@@ -708,6 +733,9 @@ function fRenderQuestion() {
   document.getElementById('f-translation').textContent=q.translation;
   document.getElementById('f-feedback').className='fill-feedback';
   document.getElementById('f-example').className='fill-example';
+  document.getElementById('f-extra-btns').className='fill-extra-btns';
+  document.getElementById('f-hira-reveal').className='hira-reveal';
+  document.getElementById('f-hira-reveal').textContent='';
   document.getElementById('f-auto-notice').classList.remove('show');
   document.getElementById('f-next-btn').style.display='none';
 
@@ -755,6 +783,9 @@ function fSelectAnswer(selected, clickedBtn) {
     document.getElementById('f-example').className='fill-example show';
     document.getElementById('f-ex-ja').textContent=`📖 ${fCurrentQ.sample}`;
     document.getElementById('f-ex-ko').textContent=fCurrentQ.translation;
+    document.getElementById('f-extra-btns').className='fill-extra-btns show';
+    document.getElementById('f-hira-reveal').className='hira-reveal';
+    document.getElementById('f-hira-reveal').textContent='';
   }
   document.getElementById('f-next-btn').style.display='inline-block';
   document.getElementById('f-next-btn').textContent=fCurrent+1<fQuizSet.length?'다음 문제 →':'결과 보기 →';
@@ -778,9 +809,27 @@ function fTimeUp() {
     document.getElementById('f-example').className='fill-example show';
     document.getElementById('f-ex-ja').textContent=`📖 ${fCurrentQ.sample}`;
     document.getElementById('f-ex-ko').textContent=fCurrentQ.translation;
+    document.getElementById('f-extra-btns').className='fill-extra-btns show';
+    document.getElementById('f-hira-reveal').className='hira-reveal';
+    document.getElementById('f-hira-reveal').textContent='';
   }
   document.getElementById('f-auto-notice').classList.add('show');
   setTimeout(()=>{ document.getElementById('f-auto-notice').classList.remove('show'); fNextQuestion(); },2000);
+}
+
+function fToggleHira() {
+  const box = document.getElementById('f-hira-reveal');
+  if (box.classList.contains('show')) {
+    box.classList.remove('show');
+  } else {
+    box.textContent = fCurrentQ.sampleHira || '히라가나 정보 없음';
+    box.classList.add('show');
+  }
+}
+
+function fOpenPapago() {
+  const sentence = encodeURIComponent(fCurrentQ.sample);
+  window.open(`https://papago.naver.com/?sk=ja&tk=ko&hn=1&st=${sentence}`, '_blank');
 }
 
 function fNextQuestion() {
