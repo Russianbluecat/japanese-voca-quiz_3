@@ -771,7 +771,16 @@ function fSelectAnswer(selected, clickedBtn) {
   const isCorrect=selected===correctWord;
   document.querySelectorAll('.fill-option-btn').forEach(b=>{
     b.disabled=true;
-    if(b.querySelector('span:last-child').textContent===correctWord) b.classList.add('correct');
+    const optWord = b.querySelector('span:last-child').textContent;
+    if(optWord === correctWord) b.classList.add('correct');
+    // 뜻 추가
+    const matchedWord = allWords.find(w => extractBracket(w.blank) === optWord);
+    if(matchedWord) {
+      const meaningSpan = document.createElement('span');
+      meaningSpan.textContent = matchedWord.meaning;
+      meaningSpan.style.cssText = 'font-size:11px; color:var(--muted); margin-left:8px; font-weight:400;';
+      b.querySelector('span:last-child').appendChild(meaningSpan);
+    }
   });
   if(!isCorrect) clickedBtn.classList.add('wrong');
   if(isCorrect){ fCorrect++; document.getElementById('f-correct').textContent=fCorrect; }
@@ -802,7 +811,15 @@ function fTimeUp() {
   const correctWord=extractBracket(fCurrentQ.blank);
   document.querySelectorAll('.fill-option-btn').forEach(b=>{
     b.disabled=true;
-    if(b.querySelector('span:last-child').textContent===correctWord) b.classList.add('correct');
+    const optWord = b.querySelector('span:last-child').textContent;
+    if(optWord === correctWord) b.classList.add('correct');
+    const matchedWord = allWords.find(w => extractBracket(w.blank) === optWord);
+    if(matchedWord) {
+      const meaningSpan = document.createElement('span');
+      meaningSpan.textContent = matchedWord.meaning;
+      meaningSpan.style.cssText = 'font-size:11px; color:var(--muted); margin-left:8px; font-weight:400;';
+      b.querySelector('span:last-child').appendChild(meaningSpan);
+    }
   });
   document.getElementById('f-sentence').innerHTML=fCurrentQ.blank.replace(/[（(][^）)]+[）)]/,`(<span class="fill-blank" style="color:var(--correct);border-color:var(--correct)">${correctWord}</span>)`);
   const fb=document.getElementById('f-feedback');
